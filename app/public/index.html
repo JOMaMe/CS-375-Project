@@ -4,8 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Funny Moment</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    h1 { text-align: center; }
+    #peter {
+      position: absolute;
+      top: 100px;
+      height: 300px;
+      left: 0;
+      animation: slide 20s linear infinite;
+    }
+    @keyframes slide {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100vw); }
+    }
+  </style>
 </head>
 <body>
   <h1>Family Guys: United In Arms</h1>
+  <img id="peter" src="Peter_Griffin.webp" alt="Peter Griffin">
+  <audio id="music" src="A-Funky-Moment-SnapYT.App.mp3" loop></audio>
+  <script>
+    // Browsers block autoplay, so start on the first click
+    document.addEventListener("click", () => document.getElementById("music").play(), { once: true });
+  </script>
 </body>
 </html>
