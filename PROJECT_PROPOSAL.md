@@ -11,7 +11,7 @@
 
 [https://github.com/JOMaMe/CS-375-Project](https://github.com/JOMaMe/CS-375-Project)
 
-The repository is private. The group plans to provide access to the instructor.
+The repository is public. The group plans to provide access to the instructor.
 
 - [ ] Confirm both group members have repository access.
 - [ ] Grant the instructor access using the Canvas username(s) and instructions.
