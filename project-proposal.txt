@@ -1,0 +1,17 @@
+Family Guys
+Haig Shamlian (hks55@drexel.edu), Jose Manuel Mena (jmm929@drexel.edu)
+Multiplayer turn-based dungeon-crawler hidden-role game
+Github: https://github.com/JOMaMe/CS-375-Project
+
+Deployment
+- Users can create games, share room code with friends to join, need exactly 4 players
+
+Game design
+- Players are assigned a random class, each with unique abilities
+- One player randomly selected to be imposter, role is hidden from other players
+- Players explore dungeon which has rooms of different types; navigator role passes between players; imposter can see entire map, other players cannot
+- Some rooms have battles against enemies
+- Players gain loot/XP as they traverse dungeon
+- Final room features battle against imposter
+
+LLM: Using AI as help when we get stuck, focus on coding the JS ourselves
