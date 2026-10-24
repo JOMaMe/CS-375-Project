@@ -10,8 +10,64 @@ Game design
 - Players are assigned a random class, each with unique abilities
 - One player randomly selected to be imposter, role is hidden from other players
 - Players explore dungeon which has rooms of different types; navigator role passes between players; imposter can see entire map, other players cannot
-- Some rooms have battles against enemies
+- Some rooms have turn-based battles against enemies
 - Players gain loot/XP as they traverse dungeon
 - Final room features battle against imposter
 
 LLM: Using AI as help when we get stuck, focus on coding the JS ourselves
+
+Experience and division of work
+- Jose Mena: Has some React experience, but describes his coding confidence
+  as low. He is comfortable contributing ideas and helping work through
+  problems.
+- Haig Shamlian: Describes his web-development skills as low-to-mid range
+  and has some game-design experience. He is confident applying that
+  experience to web development.
+We will share the work and assign tasks using a lightweight Agile process.
+Jose can take first passes on browser UI/client work, and Haig can help lead
+game-rule and game-logic work. These are starting points, not exclusive
+ownership: we will distribute tasks between both members, pair on unfamiliar
+work, and review each other's changes.
+
+Meetings and communication
+We are roommates, so we can talk about the project in person throughout the
+week. We also use Discord direct messages, and we check in with the professor
+during Thursday class.
+- Dedicated weekly work meeting: Not set yet. We will agree on a recurring
+  time, duration, and location if informal check-ins are not enough.
+- Communication channel: Discord direct messages.
+
+Task tracking
+We will use Trello as our primary task board and GitHub for the code and
+repository work. We will use Trello to assign task owners, track status, and
+coordinate the work using Agile/Scrum-style check-ins.
+
+Obstacles and how we will handle them
+- Jose: Works at least 30 hours per week across weekday and weekend jobs,
+  has a heavy course load with anatomy and physiology classes, and has senior
+  year graduation requirements to manage. We will communicate busy weeks
+  early, plan tasks around his available time, and split work into manageable
+  pieces.
+- Haig: Has many other group final projects in a heavy course load this term. Has Armenian cultural responsibilities that take up much of most
+  weekends and needs to prepare for co-op cycles and finding a job. We will
+  plan weekend-sensitive tasks ahead of time and account for co-op and job
+  preparation in task assignments.
+
+Weekly time commitment
+We expect the project to take about 12-20 team hours per week in total. Jose
+and Haig each estimate that they can contribute about 6-10 hours per week.
+These are estimates and may change during busy work, exam, or co-op periods.
+
+Keeping the workload fair
+We are okay with a reasonable, temporary difference in workload, but not with
+one person carrying most of the project while the other contributes very
+little. If the workload becomes uneven, we will discuss it and redistribute
+tasks.
+
+If someone misses commitments
+We will talk directly and early, using Discord or an in-person conversation,
+to understand what is blocking the work and agree on a realistic next step.
+We will use our check-ins to follow up, adjust task size or ownership, and
+rebalance the work if needed. If the same commitments continue to be missed,
+we will discuss the issue during a Thursday professor check-in and ask for
+guidance.
