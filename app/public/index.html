@@ -27,12 +27,32 @@
 
     let joinButton = document.getElementById("join");
     joinButton.addEventListener("click", () => {
-      messageBox.textContent = `Joining room ${codeInput.value}`;
+      fetch(`/get-code?code=${encodeURIComponent(codeInput.value)}`).then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed request to get-code`);
+        }
+        return response.text();
+      }).then((code) => {
+        messageBox.textContent = `Joining room ${code}`;
+      }).catch((error) => {
+        messageBox.textContent = "Couldn't connect to the server";
+        console.error(error);
+      });
     });
 
     let hostButton = document.getElementById("host");
     hostButton.addEventListener("click", () => {
-      messageBox.textContent = `Hosting room XXXX`;
+      fetch(`/get-new-code`).then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed request to get-new-code`);
+        } 
+        return response.text();
+      }).then((code) => {
+        messageBox.textContent = `Hosting room ${code}`;
+      }).catch((error) => {
+        messageBox.textContent = "Couldn't connect to the server";
+        console.error(error);
+      });
     });
 
   </script>
