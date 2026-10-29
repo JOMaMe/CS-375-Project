@@ -1,0 +1,29 @@
+.form {
+	padding: 1rem;
+	margin: 2rem 0;
+	border: 1px solid black;
+}
+.form label {
+	font-weight: bold;
+}
+.form div {
+	margin: 1rem 0;
+}
+
+body {
+    margin: 0; overflow: hidden;
+}
+h1 {
+    text-align: center;
+}
+#peter {
+    position: absolute;
+    top: 100px;
+    height: 300px;
+    left: 0;
+    animation: slide 20s linear infinite;
+}
+@keyframes slide {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100vw); }
+}

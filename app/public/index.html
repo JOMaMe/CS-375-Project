@@ -4,28 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Funny Moment</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    h1 { text-align: center; }
-    #peter {
-      position: absolute;
-      top: 100px;
-      height: 300px;
-      left: 0;
-      animation: slide 20s linear infinite;
-    }
-    @keyframes slide {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(100vw); }
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
   <h1>Family Guys: United In Arms</h1>
-  <img id="peter" src="Peter_Griffin.webp" alt="Peter Griffin">
+
+  <div class="form">
+    <div>
+      <label for="code">Room Code</label>
+      <input id="code" type="text" name="code">
+      <button id="join">Join Room</button>
+    </div>
+    <div>
+      <button id="host">Host Room</button>
+    </div>
+  </div>
+  <div id="message"></div>
+
+  <script>
+    let messageBox = document.getElementById("message");
+    let codeInput = document.getElementById("code");
+
+    let joinButton = document.getElementById("join");
+    joinButton.addEventListener("click", () => {
+      messageBox.textContent = `Joining room ${codeInput.value}`;
+    });
+
+    let hostButton = document.getElementById("host");
+    hostButton.addEventListener("click", () => {
+      messageBox.textContent = `Hosting room XXXX`;
+    });
+
+  </script>
+
+  <!-- <img id="peter" src="Peter_Griffin.webp" alt="Peter Griffin">
   <audio id="music" src="YTDown.com_YouTube_Media_8UjGXx8ta8c_MIX-DE-CUMBIA-REBAJADA-CHOPPED-AND-SCREWED-PARA-QUE-LO-LLORE-LA-COMPETENCIA_007_128k.mp3" loop></audio>
   <script>
     document.addEventListener("click", () => document.getElementById("music").play(), { once: true });
-  </script>
+  </script> -->
 </body>
 </html>
