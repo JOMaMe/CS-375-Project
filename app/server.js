@@ -11,18 +11,18 @@ let rooms = [];
 
 app.get("/get-code", (req, res) => {
   if (!req.query.code) {
-    return res.status(400).send("code is empty");
+    return res.status(400).send("Code is empty");
   }
   const code = req.query.code;
   if (typeof code !== "string" || !/^[A-Za-z]{4}$/.test(code)) {
-    return res.status(400).send("not a valid code format");
+    return res.status(400).send("Not a valid code format");
   }
 
   const normalizedCode = code.toUpperCase();
   if (rooms.includes(normalizedCode)) {
     return res.status(200).send(normalizedCode);
   }
-  res.status(404).send(`code ${normalizedCode} is invalid`);
+  res.status(404).send(`Code ${normalizedCode} is invalid`);
 });
 
 app.get("/get-new-code", (req, res) => {

@@ -27,40 +27,44 @@
 
     let joinButton = document.getElementById("join");
     joinButton.addEventListener("click", () => {
-      fetch(`/get-code?code=${encodeURIComponent(codeInput.value)}`).then((response) => {
+      fetch(`/get-code?code=${encodeURIComponent(codeInput.value)}`).then((response) =>
+        response.text().then((body) => {
         if (!response.ok) {
-          throw new Error(`Failed request to get-code`);
+          throw new Error(body);
         }
-        return response.text();
-      }).then((code) => {
+        return body;
+      })).then((code) => {
         messageBox.textContent = `Joining room ${code}`;
       }).catch((error) => {
-        messageBox.textContent = "Couldn't connect to the server";
+        const message = error instanceof Error ? error.message : String(error);
+        messageBox.textContent = message;
         console.error(error);
       });
     });
 
     let hostButton = document.getElementById("host");
     hostButton.addEventListener("click", () => {
-      fetch(`/get-new-code`).then((response) => {
+      fetch(`/get-new-code`).then((response) => 
+        response.text().then((body) => {
         if (!response.ok) {
-          throw new Error(`Failed request to get-new-code`);
-        } 
-        return response.text();
-      }).then((code) => {
+          throw new Error(body);
+        }
+        return body;
+      })).then((code) => {
         messageBox.textContent = `Hosting room ${code}`;
       }).catch((error) => {
-        messageBox.textContent = "Couldn't connect to the server";
+        const message = error instanceof Error ? error.message : String(error);
+        messageBox.textContent = message;
         console.error(error);
       });
     });
 
   </script>
 
-  <!-- <img id="peter" src="Peter_Griffin.webp" alt="Peter Griffin">
-  <audio id="music" src="YTDown.com_YouTube_Media_8UjGXx8ta8c_MIX-DE-CUMBIA-REBAJADA-CHOPPED-AND-SCREWED-PARA-QUE-LO-LLORE-LA-COMPETENCIA_007_128k.mp3" loop></audio>
+  <img id="peter" src="assets/Peter_Griffin.webp" alt="Peter Griffin">
+  <audio id="music" src="assets/YTDown.com_YouTube_Media_8UjGXx8ta8c_MIX-DE-CUMBIA-REBAJADA-CHOPPED-AND-SCREWED-PARA-QUE-LO-LLORE-LA-COMPETENCIA_007_128k.mp3" loop></audio>
   <script>
     document.addEventListener("click", () => document.getElementById("music").play(), { once: true });
-  </script> -->
+  </script>
 </body>
 </html>
