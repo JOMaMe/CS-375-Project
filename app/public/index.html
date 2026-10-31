@@ -9,31 +9,66 @@
 <body>
   <h1>Family Guys: United In Arms</h1>
 
-  <div class="form">
-    <div>
-      <label for="code">Room Code</label>
-      <input id="code" type="text" name="code">
-      <button id="join">Join Room</button>
+  <section id="home-screen">
+    <div class="form">
+      <div>
+        <label for="code">Room Code</label>
+        <input id="code" type="text" name="code">
+        <button id="join">Join Room</button>
+      </div>
+      <div>
+        <button id="host">Host Room</button>
+      </div>
     </div>
-    <div>
-      <button id="host">Host Room</button>
-    </div>
-  </div>
-  <div id="message"></div>
+    <div id="message" role="status"></div>
+  </section>
 
-  <div id="lobby">
+  <div id="lobby" hidden>
     <h2>Waiting Room</h2>
     <p>Room Code: <span id="room-code">Not in a room</span></p>
+    <p>Sample roster: live multiplayer not yet implemented</p>
+    <h3>Adventurers</h3>
+    <ul id="player-list"></ul>
   </div>
 
   <script>
+    const homeScreen = document.getElementById("home-screen");
+    const lobbyScreen = document.getElementById("lobby");
     const roomCodeElement = document.getElementById("room-code");
+    const playerListElement = document.getElementById("player-list");
+
+    const samplePlayers = [
+      { id: "player1", name: "Jose", connected: true },
+      { id: "player2", name: "Haig", connected: false }
+    ]
+    
     let messageBox = document.getElementById("message");
     let codeInput = document.getElementById("code");
 
 
     function renderRoomCode(code) {
       roomCodeElement.textContent = code;
+    }
+
+    function renderPlayerList(players) {
+      playerListElement.replaceChildren();
+
+      for (const player of players) {
+        const listItem = document.createElement("li");
+        const status = player.connected ? "Connected" : "Disconnected";
+        listItem.textContent = `${player.name} - ${status}`;
+        playerListElement.appendChild(listItem);
+      }
+    }
+
+    function renderRoom(room) {
+      renderRoomCode(room.code);
+      renderPlayerList(room.players);
+    }
+    
+    function showLobby() {
+      homeScreen.hidden = true;
+      lobbyScreen.hidden = false;
     }
 
     let joinButton = document.getElementById("join");
@@ -46,7 +81,8 @@
         return body;
       })).then((code) => {
         messageBox.textContent = `Joining room ${code}`;
-        renderRoomCode(code);
+        renderRoom({ code: code, players: samplePlayers })
+        showLobby();
       }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         messageBox.textContent = message;
@@ -64,7 +100,8 @@
         return body;
       })).then((code) => {
         messageBox.textContent = `Hosting room ${code}`;
-        renderRoomCode(code);
+        renderRoom({ code: code, players: samplePlayers })
+        showLobby();
       }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         messageBox.textContent = message;
