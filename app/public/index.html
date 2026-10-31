@@ -21,9 +21,20 @@
   </div>
   <div id="message"></div>
 
+  <div id="lobby">
+    <h2>Waiting Room</h2>
+    <p>Room Code: <span id="room-code">Not in a room</span></p>
+  </div>
+
   <script>
+    const roomCodeElement = document.getElementById("room-code");
     let messageBox = document.getElementById("message");
     let codeInput = document.getElementById("code");
+
+
+    function renderRoomCode(code) {
+      roomCodeElement.textContent = code;
+    }
 
     let joinButton = document.getElementById("join");
     joinButton.addEventListener("click", () => {
@@ -35,6 +46,7 @@
         return body;
       })).then((code) => {
         messageBox.textContent = `Joining room ${code}`;
+        renderRoomCode(code);
       }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         messageBox.textContent = message;
@@ -52,6 +64,7 @@
         return body;
       })).then((code) => {
         messageBox.textContent = `Hosting room ${code}`;
+        renderRoomCode(code);
       }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         messageBox.textContent = message;
@@ -59,12 +72,7 @@
       });
     });
 
-  </script>
 
-  <img id="peter" src="assets/Peter_Griffin.webp" alt="Peter Griffin">
-  <audio id="music" src="assets/YTDown.com_YouTube_Media_8UjGXx8ta8c_MIX-DE-CUMBIA-REBAJADA-CHOPPED-AND-SCREWED-PARA-QUE-LO-LLORE-LA-COMPETENCIA_007_128k.mp3" loop></audio>
-  <script>
-    document.addEventListener("click", () => document.getElementById("music").play(), { once: true });
   </script>
 </body>
 </html>
