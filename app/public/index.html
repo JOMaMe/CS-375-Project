@@ -21,45 +21,7 @@
   </div>
   <div id="message"></div>
 
-  <script>
-    let messageBox = document.getElementById("message");
-    let codeInput = document.getElementById("code");
-
-    let joinButton = document.getElementById("join");
-    joinButton.addEventListener("click", () => {
-      fetch(`/get-code?code=${encodeURIComponent(codeInput.value)}`).then((response) =>
-        response.text().then((body) => {
-        if (!response.ok) {
-          throw new Error(body);
-        }
-        return body;
-      })).then((code) => {
-        messageBox.textContent = `Joining room ${code}`;
-      }).catch((error) => {
-        const message = error instanceof Error ? error.message : String(error);
-        messageBox.textContent = message;
-        console.error(error);
-      });
-    });
-
-    let hostButton = document.getElementById("host");
-    hostButton.addEventListener("click", () => {
-      fetch(`/get-new-code`).then((response) => 
-        response.text().then((body) => {
-        if (!response.ok) {
-          throw new Error(body);
-        }
-        return body;
-      })).then((code) => {
-        messageBox.textContent = `Hosting room ${code}`;
-      }).catch((error) => {
-        const message = error instanceof Error ? error.message : String(error);
-        messageBox.textContent = message;
-        console.error(error);
-      });
-    });
-
-  </script>
+  <script src="index.js"></script>
 
   <img id="peter" src="assets/Peter_Griffin.webp" alt="Peter Griffin">
   <audio id="music" src="assets/YTDown.com_YouTube_Media_8UjGXx8ta8c_MIX-DE-CUMBIA-REBAJADA-CHOPPED-AND-SCREWED-PARA-QUE-LO-LLORE-LA-COMPETENCIA_007_128k.mp3" loop></audio>

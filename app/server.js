@@ -7,6 +7,18 @@ const port = 3000;
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
+const http = require("http");
+const { WebSocketServer } = require("ws");
+
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+wss.on("connection", (socket) => {
+  socket.on("message", (data) => {
+    // Parse and validate messages; handle joining a room or game actions.
+  });
+});
+
 let rooms = [];
 
 app.get("/get-code", (req, res) => {
@@ -35,6 +47,6 @@ app.get("/get-new-code", (req, res) => {
   res.status(200).send(code);
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
