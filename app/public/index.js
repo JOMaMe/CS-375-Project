@@ -3,7 +3,7 @@ let codeInput = document.getElementById("code");
 
 let joinButton = document.getElementById("join");
 joinButton.addEventListener("click", () => {
-    fetch(`/get-code?code=${encodeURIComponent(codeInput.value)}`).then((response) =>
+    fetch(`/code?code=${encodeURIComponent(codeInput.value)}`).then((response) =>
     response.text().then((body) => {
         if (!response.ok) {
             throw new Error(body);
@@ -20,7 +20,7 @@ joinButton.addEventListener("click", () => {
 
 let hostButton = document.getElementById("host");
 hostButton.addEventListener("click", () => {
-    fetch(`/get-new-code`).then((response) => 
+    fetch(`/new-code`, { method: "POST" }).then((response) => 
         response.text().then((body) => {
         if (!response.ok) {
             throw new Error(body);

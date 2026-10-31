@@ -19,9 +19,9 @@ wss.on("connection", (socket) => {
   });
 });
 
-let rooms = [];
+const rooms = new Map();
 
-app.get("/get-code", (req, res) => {
+app.get("/code", (req, res) => {
   if (!req.query.code) {
     return res.status(400).send("Code is empty");
   }
@@ -31,19 +31,19 @@ app.get("/get-code", (req, res) => {
   }
 
   const normalizedCode = code.toUpperCase();
-  if (rooms.includes(normalizedCode)) {
+  if (rooms.has(normalizedCode)) {
     return res.status(200).send(normalizedCode);
   }
   res.status(404).send(`Code ${normalizedCode} is invalid`);
 });
 
-app.get("/get-new-code", (req, res) => {
+app.post("/new-code", (req, res) => {
   let code;
   do {
     code = Array.from({ length: 4 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join("");
-  } while (rooms.includes(code));
+  } while (rooms.has(code));
 
-  rooms.push(code);
+  rooms.set(code, {});
   res.status(200).send(code);
 });
 
