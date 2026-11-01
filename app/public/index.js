@@ -11,6 +11,7 @@ joinButton.addEventListener("click", () => {
         return body;
     })).then((code) => {
         messageBox.textContent = `Joining room ${code}`;
+        window.location.href = `/room.html?code=${encodeURIComponent(code)}`;
     }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         messageBox.textContent = message;
@@ -28,6 +29,7 @@ hostButton.addEventListener("click", () => {
         return body;
     })).then((code) => {
         messageBox.textContent = `Hosting room ${code}`;
+        window.location.href = `/room.html?code=${encodeURIComponent(code)}`;
     }).catch((error) => {
         const message = error instanceof Error ? error.message : String(error);
         messageBox.textContent = message;
