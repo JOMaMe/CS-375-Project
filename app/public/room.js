@@ -47,12 +47,12 @@ socket.addEventListener("error", (error) => {
   connectionStatus.textContent = "Could not connect to the room.";
 });
 
-function renderPlayers(playerIds) {
+function renderPlayers(players) {
   playersList.replaceChildren();
 
-  for (const playerId of playerIds) {
+  for (const [slot, playerId] of players) {
     const player = document.createElement("li");
-    player.textContent = playerId;
+    player.textContent = `Player ${slot}: ${playerId}`;
     playersList.append(player);
   }
 }

@@ -25,7 +25,7 @@ function broadcastPlayers(roomCode) {
 
   const message = JSON.stringify({
     type: "players",
-    players: Array.from(room.players)
+    players: Array.from(room.players.entries())
   });
 
   for (const client of wss.clients) {
@@ -69,15 +69,23 @@ wss.on("connection", (socket) => {
       return;
     }
 
+    const room = rooms.get(roomCode);
+    const playerSlot = [1, 2, 3, 4].find((slot) => !room.players.has(slot));
+    if (playerSlot === undefined) {
+      socket.send(JSON.stringify({ type: "error", message: "Room is full" }));
+      socket.close(1008, "Room is full");
+      return;
+    }
+
     const playerId = randomUUID();
     socket.playerId = playerId;
     socket.roomCode = roomCode;
-    rooms.get(roomCode).players.add(playerId);
+    room.players.set(playerSlot, playerId);
     socket.send(JSON.stringify({
       type: "joined",
       code: roomCode,
       playerId,
-      players: Array.from(rooms.get(roomCode).players)
+      players: Array.from(room.players.entries())
     }));
     broadcastPlayers(roomCode);
   });
@@ -89,7 +97,12 @@ wss.on("connection", (socket) => {
 
     const room = rooms.get(socket.roomCode);
     if (room) {
-      room.players.delete(socket.playerId);
+      for (const [slot, playerId] of room.players) {
+        if (playerId === socket.playerId) {
+          room.players.delete(slot);
+          break;
+        }
+      }
       broadcastPlayers(socket.roomCode);
     }
   });

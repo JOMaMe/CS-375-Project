@@ -1,7 +1,7 @@
 class RoomState {
     constructor() {
       this.status = 0;
-      this.players = new Set();
+      this.players = new Map();
       this.gameState = {};
     }
   }
