@@ -7,9 +7,108 @@ const port = 3000;
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-let rooms = [];
+const RoomState = require("./room-state");
+const rooms = new Map();
 
-app.get("/get-code", (req, res) => {
+
+const http = require("http");
+const { randomUUID } = require("crypto");
+const { WebSocket, WebSocketServer } = require("ws");
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+function broadcastPlayers(roomCode) {
+  const room = rooms.get(roomCode);
+  if (!room) {
+    return;
+  }
+
+  const message = JSON.stringify({
+    type: "players",
+    players: Array.from(room.players.entries())
+  });
+
+  for (const client of wss.clients) {
+    if (client.roomCode === roomCode && client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+}
+
+wss.on("connection", (socket) => {
+  socket.on("message", (data) => {
+    let message;
+    try {
+      message = JSON.parse(data.toString());
+    } catch (error) {
+      socket.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
+      socket.close(1008, "Invalid message format");
+      return;
+    }
+
+    if (
+      !message ||
+      message.type !== "join-room" ||
+      typeof message.code !== "string" ||
+      !/^[A-Za-z]{4}$/.test(message.code)
+    ) {
+      socket.send(JSON.stringify({ type: "error", message: "Invalid room join request" }));
+      socket.close(1008, "Invalid room join request");
+      return;
+    }
+
+    const roomCode = message.code.toUpperCase();
+    if (!rooms.has(roomCode)) {
+      socket.send(JSON.stringify({ type: "error", message: "Room does not exist" }));
+      socket.close(1008, "Room does not exist");
+      return;
+    }
+
+    if (socket.roomCode) {
+      socket.send(JSON.stringify({ type: "error", message: "This connection has already joined a room" }));
+      return;
+    }
+
+    const room = rooms.get(roomCode);
+    const playerSlot = [1, 2, 3, 4].find((slot) => !room.players.has(slot));
+    if (playerSlot === undefined) {
+      socket.send(JSON.stringify({ type: "error", message: "Room is full" }));
+      socket.close(1008, "Room is full");
+      return;
+    }
+
+    const playerId = randomUUID();
+    socket.playerId = playerId;
+    socket.roomCode = roomCode;
+    room.players.set(playerSlot, playerId);
+    socket.send(JSON.stringify({
+      type: "joined",
+      code: roomCode,
+      playerId,
+      players: Array.from(room.players.entries())
+    }));
+    broadcastPlayers(roomCode);
+  });
+
+  socket.on("close", () => {
+    if (!socket.roomCode || !socket.playerId) {
+      return;
+    }
+
+    const room = rooms.get(socket.roomCode);
+    if (room) {
+      for (const [slot, playerId] of room.players) {
+        if (playerId === socket.playerId) {
+          room.players.delete(slot);
+          break;
+        }
+      }
+      broadcastPlayers(socket.roomCode);
+    }
+  });
+});
+
+app.get("/code", (req, res) => {
   if (!req.query.code) {
     return res.status(400).send("Code is empty");
   }
@@ -19,22 +118,22 @@ app.get("/get-code", (req, res) => {
   }
 
   const normalizedCode = code.toUpperCase();
-  if (rooms.includes(normalizedCode)) {
+  if (rooms.has(normalizedCode)) {
     return res.status(200).send(normalizedCode);
   }
   res.status(404).send(`Code ${normalizedCode} is invalid`);
 });
 
-app.get("/get-new-code", (req, res) => {
+app.post("/new-code", (req, res) => {
   let code;
   do {
     code = Array.from({ length: 4 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join("");
-  } while (rooms.includes(code));
+  } while (rooms.has(code));
 
-  rooms.push(code);
+  rooms.set(code, new RoomState());
   res.status(200).send(code);
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funny Moment</title>
+  <link rel="stylesheet" type="text/css" href="room.css">
+</head>
+<body>
+  <h1>Waiting Room</h1>
+  <p>Room code: <strong id="room-code"></strong></p>
+  <p id="connection-status" role="status">Connecting to room...</p>
+  <h2>Players</h2>
+  <ul id="players"></ul>
+  <script src="room.js"></script>
+
+  <div class="rendering-window">
+    <div class="background-layer">
+        <img src="assets/background.jpg">
+    </div>
+
+    <div class="character-layer">
+        <img id="peter" src="assets/Peter_Griffin.webp" style="left: 100px; top: 200px;">
+        <img id="peter" src="assets/Peter_Griffin.webp" style="left: 400px; top: 200px;">
+    </div>
+
+    <div class="vfx-layer">
+        <img src="">
+    </div>
+</div>
+</body>

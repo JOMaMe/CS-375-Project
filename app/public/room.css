@@ -1,0 +1,32 @@
+.rendering-window {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    overflow: hidden;
+}
+.background-layer,
+.character-layer,
+.vfx-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+.background-layer {
+    z-index: 0;
+}
+.character-layer {
+    z-index: 1;
+}
+.vfx-layer {
+    z-index: 2;
+}
+.rendering-window img {
+    position: absolute;
+}
+#peter {
+    top: 100px;
+    height: 50px;
+    left: 0;
+}
