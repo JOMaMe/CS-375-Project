@@ -25,6 +25,11 @@
 .rendering-window img {
     position: absolute;
 }
+.container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
 #peter {
     top: 100px;
     height: 50px;
