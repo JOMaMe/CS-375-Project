@@ -5,10 +5,11 @@ class GameState {
             enemies: {
                 front: [],
                 back: []
-            }
+            },
+            map: {}
         };
         this.private = {
-            map: {}
+            dungeon: {}
         }
     }
 
