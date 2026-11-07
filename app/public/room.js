@@ -6,6 +6,7 @@ const startButton = document.getElementById("start");
 const waitingRoom = document.querySelector(".waiting-room");
 const gameWindow = document.querySelector(".game-window");
 let id = "";
+let hasJoinedRoom = false;
 
 roomCodeElement.textContent = roomCode ? roomCode.toUpperCase() : "";
 
@@ -32,10 +33,11 @@ socket.addEventListener("message", (event) => {
 
   if (message.type === "joined") {
     id = message.playerId;
-    isHost = (message.host === id);
+    const isHost = (message.host === id);
     startButton.hidden = !isHost;
     connectionStatus.textContent = `Joined room ${message.code} as ${(isHost) ? "host" : "player"}.`;
     renderPlayers(message.players);
+    hasJoinedRoom = true;
   } else if (message.type === "players") {
     renderPlayers(message.players);
   } else if (message.type === "game-started") {
@@ -47,7 +49,7 @@ socket.addEventListener("message", (event) => {
 });
 
 socket.addEventListener("close", () => {
-  if (connectionStatus.textContent === "Connected. Checking room...") {
+  if (hasJoinedRoom || connectionStatus.textContent === "Connected. Checking room...") {
     connectionStatus.textContent = "Disconnected from the room.";
   }
 });
