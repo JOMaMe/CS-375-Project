@@ -7,25 +7,30 @@
   <link rel="stylesheet" type="text/css" href="room.css">
 </head>
 <body>
-  <h1>Waiting Room</h1>
-  <p>Room code: <strong id="room-code"></strong></p>
-  <p id="connection-status" role="status">Connecting to room...</p>
-  <h2>Players</h2>
-  <ul id="players"></ul>
-  <script src="room.js"></script>
+<div class="waiting-room">
+    <h1>Waiting Room</h1>
+    <p>Room code: <strong id="room-code"></strong></p>
+    <p id="connection-status" role="status">Connecting to room...</p>
+    <button id="start" hidden>Start Game</button>
+    <h2>Players</h2>
+    <ul id="players"></ul>
+</div>
 
-  <div class="rendering-window">
-    <div class="background-layer">
-        <img src="assets/background.jpg">
-    </div>
+<div class="game-window" hidden>
+    <div class="rendering-window">
+        <div class="background-layer">
+            <img src="assets/background.jpg">
+        </div>
 
-    <div class="character-layer">
-        <img id="peter" src="assets/Peter_Griffin.webp" style="left: 100px; top: 200px;">
-        <img id="peter" src="assets/Peter_Griffin.webp" style="left: 400px; top: 200px;">
-    </div>
+        <div class="character-layer">
+            <img id="peter" src="assets/Peter_Griffin.webp" style="left: 100px; top: 200px;">
+            <img id="peter" src="assets/Peter_Griffin.webp" style="left: 400px; top: 200px;">
+        </div>
 
-    <div class="vfx-layer">
-        <img src="">
+        <div class="vfx-layer">
+            <img src="">
+        </div>
     </div>
 </div>
+<script src="room.js"></script>
 </body>

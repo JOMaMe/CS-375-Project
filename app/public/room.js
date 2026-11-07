@@ -2,6 +2,10 @@ const roomCode = new URLSearchParams(window.location.search).get("code");
 const roomCodeElement = document.getElementById("room-code");
 const connectionStatus = document.getElementById("connection-status");
 const playersList = document.getElementById("players");
+const startButton = document.getElementById("start");
+const waitingRoom = document.querySelector(".waiting-room");
+const gameWindow = document.querySelector(".game-window");
+let id = "";
 
 roomCodeElement.textContent = roomCode ? roomCode.toUpperCase() : "";
 
@@ -27,11 +31,17 @@ socket.addEventListener("message", (event) => {
   }
 
   if (message.type === "joined") {
-    connectionStatus.textContent = `Joined room ${message.code} as ${message.playerId}.`;
+    id = message.playerId;
+    isHost = (message.host === id);
+    startButton.hidden = !isHost;
+    connectionStatus.textContent = `Joined room ${message.code} as ${(isHost) ? "host" : "player"}.`;
     renderPlayers(message.players);
   } else if (message.type === "players") {
     renderPlayers(message.players);
-  } else if (message.type === "error") {
+  } else if (message.type === "game-started") {
+    startGame();
+  }
+  else if (message.type === "error") {
     connectionStatus.textContent = message.message;
   }
 });
@@ -56,3 +66,15 @@ function renderPlayers(players) {
     playersList.append(player);
   }
 }
+function startGame() {
+  waitingRoom.hidden = true;
+  gameWindow.hidden = false;
+}
+
+startButton.addEventListener("click", () => {
+  if (socket.readyState !== WebSocket.OPEN) {
+    connectionStatus.textContent = "Not connected to the server.";
+    return;
+  }
+  socket.send(JSON.stringify({ type: "start-game" }));
+});
