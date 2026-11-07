@@ -62,7 +62,12 @@ function renderPlayers(players) {
 
   for (const [slot, playerId] of players) {
     const player = document.createElement("li");
-    player.textContent = `Player ${slot}: ${playerId}`;
+    player.textContent = `Player ${slot}`;
+
+    if (playerId === id) {
+      player.textContent += " (You)";
+    }
+    
     playersList.append(player);
   }
 }
