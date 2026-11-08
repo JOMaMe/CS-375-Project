@@ -4,7 +4,9 @@
   --panel: rgba(19, 28, 24, 0.94);
   --line: rgba(220, 226, 207, 0.24);
   --ember: #df744b;
+  --ember-hover: #ed9679;
   --teal: #80b7a3;
+  --teal-hover: #a0cdbb;
 }
 
 * {
@@ -31,14 +33,25 @@ main {
   padding-block: 2rem;
 }
 
+/* Title */
+.title-block {
+  text-align: center;
+}
+
 h1 {
   margin: 0;
   color: #f4e4cb;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2.5rem;
-  text-align: center;
 }
 
+.team-name {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+/* Room form and input */
 .form {
   display: grid;
   gap: 1rem;
@@ -49,43 +62,82 @@ h1 {
   box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.3);
 }
 
-.form > div {
-  margin: 0;
-}
-
-.form > div:first-child {
+.join-room {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.75rem;
 }
 
-.form label {
+.join-room label {
   grid-column: 1 / -1;
   color: var(--muted);
   font-weight: bold;
 }
 
-.form > div:last-child {
-  display: flex;
-  justify-content: flex-end;
+#code {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: inherit;
 }
 
+/* Buttons */
+button {
+  border: 0;
+  border-radius: 4px;
+  color: #17201c;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#host {
+  display: block;
+  min-width: 12rem;
+  min-height: 3rem;
+  margin-inline: auto;
+  padding: 0.85rem 1.25rem;
+  background: var(--ember);
+  font-size: 1.05rem;
+}
+
+#host:hover {
+  background: var(--ember-hover);
+}
+
+#join {
+  min-width: 9rem;
+  min-height: 2rem;
+  justify-self: end;
+  background: var(--teal);
+}
+
+#join:hover {
+  background: var(--teal-hover);
+}
+
+button:focus-visible,
+#code:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Status message */
 #message {
   min-height: 1.5rem;
   color: var(--muted);
   text-align: center;
 }
 
+/* Narrow screens */
 @media (max-width: 34rem) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  .form {
-    padding: 1rem;
-  }
-
-  .form > div:first-child {
+  .join-room {
     grid-template-columns: 1fr;
+  }
+
+  #join {
+    justify-self: start;
   }
 }
