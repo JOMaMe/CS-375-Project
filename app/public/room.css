@@ -1,3 +1,96 @@
+.room-page {
+        display: flex;
+        flex-direction: column;
+        padding-block: 2rem;
+}
+
+.waiting-room {
+  width: min(42rem, calc(100% - 2rem));
+    margin-inline: auto;
+  padding: 1.5rem;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.3);
+}
+
+.waiting-room h1 {
+    margin: 0 0 1.5rem;
+    color: #f4e4cb;
+    font-family: Georgia, "Times New Roman", serif;
+    text-align: center;
+}
+
+.waiting-room h2 {
+    margin-bottom: 0.5rem;
+    color: var(--muted);
+    font-size: 1rem;
+}
+
+.waiting-room p {
+    line-height: 1.5;
+}
+
+#room-code {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: rgba(241, 238, 228, 0.08);
+    font-size: 1.1rem;
+}
+
+#connection-status {
+    color: var(--muted);
+}
+
+#players {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#players li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+#players li:last-child {
+    border-bottom: 0;
+}
+
+#start {
+    padding: 0.75rem 1.25rem;
+    border: 0;
+    border-radius: 4px;
+    background: var(--ember);
+    color: #17201c;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#start:hover {
+    background: var(--ember-hover);
+}
+
+#start:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+}
+
+@media (max-width: 34rem) {
+    .room-page {
+        padding-block: 1rem;
+    }
+
+    .waiting-room {
+        padding: 1rem;
+    }
+}
+
 .rendering-window {
     position: relative;
     width: 800px;

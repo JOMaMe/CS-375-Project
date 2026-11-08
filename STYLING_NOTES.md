@@ -1,47 +1,31 @@
 # Styling Notes
 
+These notes describe the current shared theme, home page, and waiting-room styles. The CSS changes appearance and layout; it does not change the room or WebSocket behavior.
 
+## Shared Theme
 
-## Current Style Sections
+Both `index.html` and `room.html` load `theme.css` before their page-specific stylesheet. The `:root` rule defines reusable colors such as `--ink`, `--panel`, `--ember`, and `--teal`. A rule uses one with `var(--ink)`, so a palette adjustment can be made centrally.
 
-### Color variables
+The shared `*` rule sets `box-sizing: border-box`, which includes padding and borders in an element's declared size. The shared `body` rule sets the common font, text color, minimum page height, and dungeon background. A dark gradient is layered over the image to keep foreground text readable.
 
-The `:root` section defines reusable colors named `--ink`, `--muted`, `--panel`, `--line`, `--ember`, and `--teal`.
+The `--ember-hover` and `--teal-hover` colors are lighter tones of the button colors. They are used when the pointer hovers over the corresponding buttons.
 
-Think of these as labeled paint jars: another rule can use `var(--ink)` instead of repeating the color value. This makes the palette easier to adjust.
+## Home Page: `style.css`
 
-### Consistent sizing
+The `main` rule uses CSS Grid to arrange the title, form, and status message vertically. Its `gap` creates space between them. The `min()` width keeps the content narrow enough to read on desktop while leaving room at smaller widths; `margin-inline: auto` centers it.
 
-The universal `*` rule sets `box-sizing: border-box`. This makes an element's declared width include its padding and border, which makes layout sizing easier to predict.
+The `.title-block` groups the game title and team name. The `h1` rule gives the game title a larger serif style; `.team-name` is the smaller supporting line.
 
-### Page background and default text
+The `.form` rule creates the dark control panel. `.join-room` lays out the room-code label, input, and Join button. The label spans the grid columns; on wide screens the input takes flexible space and the button sits beside it. The `#code` rule styles the input. The `#host` and `#join` rules set the larger ember Host button and smaller teal Join button, while their `:hover` rules change colors when pointed at.
 
-The `body` rule removes the browser's default margin, makes the page at least as tall as the viewport, and sets the default text color and font. Its background stacks a dark transparent gradient over `assets/background.jpg`. The gradient reduces the image's brightness so foreground text is easier to read; the image path is relative to `style.css`.
+The shared `button:focus-visible` and `#code:focus-visible` rules add a visible outline for keyboard navigation. `#message` reserves space and centers status/error text.
 
-### Main content layout
+The `@media (max-width: 34rem)` rule changes the join row to one column and aligns Join to the start, making the controls fit narrower screens.
 
-The `main` rule uses CSS Grid to arrange the page content and adds space between items. `width: min(42rem, calc(100% - 2rem))` keeps the content from becoming too wide on desktop while leaving a margin on small screens. `margin-inline: auto` centers it horizontally. The minimum viewport height and vertical padding help center the content while keeping breathing room.
+## Waiting Room: `room.css`
 
-### Main heading
+`room.html` uses the `room-page` body class. Its rule uses a vertical flex layout and page padding. `.waiting-room` centers the lobby panel, applies the shared panel colors, and adds a border and shadow. The room heading, room code, connection status, and roster have separate rules so each is easy to scan.
 
-The `h1` rule removes the default margin, centers the heading, and uses a serif font and warm light color to give the game title a storybook feel.
+The `#players` list removes browser bullets and spacing. Each list item gets a bottom divider rather than a separate card. The `#start` button uses the shared ember color and has a visible keyboard focus outline. The narrow-screen media query reduces outer and panel padding.
 
-### Room form panel
-
-The `.form` rule turns the existing form container into a dark panel. Grid layout and `gap` space its sections; padding gives content room inside; the border, small corner radius, and shadow separate the panel from the background.
-
-The `.form > div` rule removes the old margins from the form's direct child sections. `.form > div:first-child` lays out the room-code input and Join button in two columns, while `minmax(0, 1fr)` lets the input column shrink without forcing the panel wider. `.form label` spans both columns and uses the muted text color. `.form > div:last-child` places the Host button at the right side of its row.
-
-### Status message
-
-The `#message` rule reserves a little vertical space so the page does not jump when a status or error message appears. It centers the text and uses the muted color.
-
-### Narrow-screen layout
-
-The media query applies when the viewport is at most `34rem` wide. It reduces the heading and panel padding, then changes the room-code row to one column so the input and Join button can fit on narrow screens.
-
-## Current Limits and Next Styling Step
-
-The input and buttons do not yet have custom colors, sizes, hover states, or keyboard-focus styles, so they still mostly use browser defaults. The accent variables are also waiting to be applied. Next, style the input and buttons, add a clear `:focus-visible` outline for keyboard users, and check the page at desktop and narrow mobile widths.
-
-The CSS keeps the existing HTML IDs and does not add behavior. Hosting, joining, room-code validation, and status messages continue to be handled by the existing JavaScript.
+The existing game-scene rules below these styles are separate and have not been redesigned as part of the home/waiting-room task.
