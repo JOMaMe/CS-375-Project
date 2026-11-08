@@ -235,3 +235,37 @@ See [TASKS.md](TASKS.md) for a proposed split between my rendering work and
 Haig's server/game-state work, integration boundaries, and completion checks.
 The split is a proposal for us to agree on, not work already assigned or done.
 I still want guidance and review while writing the game code myself.
+
+## 2026-11-07: Styling the home page and waiting room
+
+I styled the home page and waiting room to use the same dungeon field-guide look. The CSS controls appearance and layout; the existing JavaScript still handles creating rooms, joining them, and updating the player list.
+
+### How I organized the styles
+
+I put shared colors and page-wide styles in `app/public/theme.css`. Both `index.html` and `room.html` load `theme.css` before their own stylesheet. This lets both pages share the background, font, and colors without making every rule apply to both pages.
+
+In `:root`, I gave colors names like `--ink`, `--panel`, `--ember`, and `--teal`. In another rule, `var(--ink)` uses the value saved under that name. If I change the color in `:root`, the places using that variable update too.
+
+I set `box-sizing: border-box` for every element. That makes an element's width include its padding and border, so the input and panels are easier to size without accidentally overflowing.
+
+### Spacing and layout choices
+
+I used `rem` for most spacing and text sizes. A `rem` is based on the root font size, usually 16 pixels, so `1rem` is usually 16 pixels. This keeps sizes consistent and lets spacing grow if someone increases their default text size. I used `px` for thin borders and outlines because I want those details to stay precise.
+
+I use `margin` for space outside an element and `padding` for space inside it. For example, `padding: 1.5rem` gives the contents of `.form` room inside its border. `margin-inline: auto` gives an element equal leftover space on its left and right, which centers it horizontally. `margin: 0` removes the browser's default outside spacing from the title.
+
+The home page's `main` uses Grid to stack the title, form, and message. `gap: 1.5rem` adds even space between them. The width rule `min(42rem, calc(100% - 2rem))` caps the content width on a large screen and leaves a margin on smaller screens. `min-height: 100vh` makes the main area at least as tall as the browser window, so `align-content: center` can center its contents vertically.
+
+In `.join-room`, `grid-template-columns: minmax(0, 1fr) auto` creates an input column that can use the available width and a button column sized to the Join button. The label uses `grid-column: 1 / -1` to span both columns. At widths below `34rem`, the media query switches to one column so the input and Join button stack.
+
+### Buttons and interaction
+
+I made Host the larger ember button and Join the smaller teal button. Their hover rules use lighter colors to show when the pointer is over a button. `:focus-visible` adds an outline when I navigate with a keyboard, so the selected control is easier to see.
+
+The button rule includes `transition: background-color 0.3s ease, transform 0.3s ease`. The `0.3s` is how long the change takes, and `ease` makes it start and finish gently. The hover rules currently change the background color, so that is the transition I can see. `transform` is listed too, but it will only animate if a rule changes the button's transform value.
+
+### Waiting-room styles
+
+I added a `room-page` class to the room page's body so I can control its spacing without changing the home page. `.waiting-room` uses the shared panel colors and `margin-inline: auto` to center it. Separate rules make the room code stand out, remove the default player-list bullets, and add dividers between players. The Start button uses the same ember color and keyboard-focus outline as Host.
+
+The game scene has its own existing rules in `room.css`; I have not redesigned that part yet. The styling does not add player names or connection details that the server does not currently send.
