@@ -8,7 +8,7 @@
   <link rel="stylesheet" type="text/css" href="room.css">
 </head>
 <body class="room-page">
-<div class="waiting-room">
+<div class="menu" id="waiting-room">
     <h1>Waiting Room</h1>
     <p>Room code: <strong id="room-code"></strong></p>
     <p id="connection-status" role="status">Connecting to room...</p>
@@ -19,30 +19,26 @@
 
 <div class="game-window" hidden>
     <div class="container">
-        <div>
-            <div class="rendering-window">
-                <div class="background-layer">
-                    <img src="assets/background.jpg">
-                </div>
-
-                <div class="character-layer">
-                    <img id="peter" src="assets/Peter_Griffin.webp" style="left: 100px; top: 200px;">
-                    <img id="peter" src="assets/Peter_Griffin.webp" style="left: 400px; top: 200px;">
-                </div>
-
-                <div class="vfx-layer">
-                    <img src="">
-                </div>
+        <div class="rendering-window">
+            <div class="background-layer">
+                <img src="assets/background.jpg">
             </div>
-            <div>
-                <div>Action Bar</div>
-                <div>Inventory Bar</div>
+
+            <div class="character-layer">
+                <img id="peter" src="assets/Peter_Griffin.webp" style="left: 100px; top: 200px;">
+                <img id="peter" src="assets/Peter_Griffin.webp" style="left: 400px; top: 200px;">
+            </div>
+
+            <div class="vfx-layer">
+                <img src="">
             </div>
         </div>
-        <div>
-            <div>Map Menu</div>
-            <div>Stats Menu</div>
+        <div id="map" class="menu">Map Menu</div>
+        <div id="bottom-bar">
+            <div id="action" class="menu">Action Bar</div>
+            <div id="inventory" class="menu">Inventory Bar</div>
         </div>
+        <div id="stats" class="menu">Stats Menu</div>
     </div>
 </div>
 <script src="room.js"></script>
