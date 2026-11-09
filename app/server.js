@@ -51,16 +51,7 @@ wss.on("connection", (socket) => {
       return;
     }
 
-    const room = rooms.get(socket.roomCode);
-    if (room) {
-      for (const [slot, playerId] of room.players) {
-        if (playerId === socket.playerId) {
-          room.players.delete(slot);
-          break;
-        }
-      }
-      broadcastPlayers(socket.roomCode);
-    }
+    removePlayerFromRoom(socket.roomCode, socket.playerId);
   });
 });
 
@@ -162,6 +153,8 @@ app.post("/new-code", (req, res) => {
   res.status(200).send(code);
 });
 
+
+
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
@@ -199,5 +192,25 @@ function broadcastPlayers(roomCode) {
     if (client.roomCode === roomCode && client.readyState === WebSocket.OPEN) {
       client.send(message);
     }
+  }
+}
+
+function removePlayerFromRoom(roomCode, playerId) {
+  const room = rooms.get(roomCode);
+  if (!room) {
+    return;
+  }
+
+  for (const [slot, id] of room.players) {
+    if (id === playerId) {
+      room.players.delete(slot);
+      break;
+    }
+  }
+
+  if (room.players.size === 0) {
+    rooms.delete(roomCode);
+  } else {
+    broadcastPlayers(roomCode);
   }
 }
