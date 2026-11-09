@@ -1,0 +1,24 @@
+:root {
+  --ink: #f1eee4;
+  --muted: #c0c6bb;
+  --panel: rgba(19, 28, 24, 0.94);
+  --line: rgba(220, 226, 207, 0.24);
+  --ember: #df744b;
+  --ember-hover: #ed9679;
+  --teal: #80b7a3;
+  --teal-hover: #a0cdbb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  font-family: "Trebuchet MS", sans-serif;
+  background:
+    linear-gradient(rgba(11, 17, 15, 0.62), rgba(11, 17, 15, 0.82)),
+    url("assets/background.jpg") center / cover no-repeat;
+}

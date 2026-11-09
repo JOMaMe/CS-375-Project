@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Funny Moment</title>
+  <title>The Evil Amongst Us</title>
+  <link rel="stylesheet" type="text/css" href="theme.css">
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
-  <h1>Family Guys: United In Arms</h1>
+
+<main>  
+  <header class="title-block">
+  <h1>The Evil Amongst Us</h1>
+  <p class="team-name">Family Guys: United in Arms</p>
+  </header>
 
   <div class="form">
-    <div>
+    <div class="join-room">
       <label for="code">Room Code</label>
       <input id="code" type="text" name="code">
       <button id="join">Join Room</button>
@@ -19,14 +27,12 @@
       <button id="host">Host Room</button>
     </div>
   </div>
-  <div id="message"></div>
+
+  <div id="message" role="status"></div>
 
   <script src="index.js"></script>
+</main>
 
-  <!-- <img id="peter" src="assets/Peter_Griffin.webp" alt="Peter Griffin">
-  <audio id="music" src="assets/YTDown.com_YouTube_Media_8UjGXx8ta8c_MIX-DE-CUMBIA-REBAJADA-CHOPPED-AND-SCREWED-PARA-QUE-LO-LLORE-LA-COMPETENCIA_007_128k.mp3" loop></audio>
-  <script>
-    document.addEventListener("click", () => document.getElementById("music").play(), { once: true });
-  </script> -->
 </body>
+
 </html>

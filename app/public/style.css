@@ -1,29 +1,118 @@
-.form {
-	padding: 1rem;
-	margin: 2rem 0;
-	border: 1px solid black;
-}
-.form label {
-	font-weight: bold;
-}
-.form div {
-	margin: 1rem 0;
+main {
+  display: grid;
+  align-content: center;
+  gap: 1.5rem;
+  width: min(42rem, calc(100% - 2rem));
+  min-height: 100vh;
+  margin-inline: auto;
+  padding-block: 2rem;
 }
 
-body {
-    margin: 0; overflow: hidden;
+/* Title */
+.title-block {
+  text-align: center;
 }
+
 h1 {
-    text-align: center;
+  margin: 0;
+  color: #f4e4cb;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.5rem;
 }
-#peter {
-    position: absolute;
-    top: 100px;
-    height: 300px;
-    left: 0;
-    animation: slide 20s linear infinite;
+
+.team-name {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
 }
-@keyframes slide {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(100vw); }
+
+/* Room form and input */
+.form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.3);
+}
+
+.join-room {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+}
+
+.join-room label {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-weight: bold;
+}
+
+#code {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: inherit;
+}
+
+/* Buttons */
+button {
+  border: 0;
+  border-radius: 4px;
+  color: #17201c;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#host {
+  display: block;
+  min-width: 12rem;
+  min-height: 3rem;
+  margin-inline: auto;
+  padding: 0.85rem 1.25rem;
+  background: var(--ember);
+  font-size: 1.05rem;
+}
+
+#host:hover {
+  background: var(--ember-hover);
+}
+
+#join {
+  min-width: 9rem;
+  min-height: 2rem;
+  justify-self: end;
+  background: var(--teal);
+}
+
+#join:hover {
+  background: var(--teal-hover);
+}
+
+button:focus-visible,
+#code:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Status message */
+#message {
+  min-height: 1.5rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Narrow screens */
+@media (max-width: 34rem) {
+  .join-room {
+    grid-template-columns: 1fr;
+  }
+
+  #join {
+    justify-self: start;
+  }
 }
