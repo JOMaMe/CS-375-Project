@@ -36,27 +36,27 @@ currently planned.
 
 ## Planned features
 
-- [x] Players can create or join a party room, share a room code, and see the
-  party roster and connection status.
-- [x] The party explores together in turns, with the navigator role rotating
+- [x] Players can create or join a party room, share a room code, and see the party roster and connection status.
+	- [ ] Reconnection Inquiries
+- [ ] The party explores together in turns, with the navigator role rotating
   through the party.
-- [x] One party member is randomly assigned as the hidden imposter. The
+- [ ] One party member is randomly assigned as the hidden imposter. The
   imposter sees the full map; other players do not.
-- [x] Navigation can affect encounter chances, loot, and opportunities to find
+- [ ] Navigation can affect encounter chances, loot, and opportunities to find
   or upgrade items and weapons.
-- [x] Battles use turns, with initiative rolled once at the start of each
+- [ ] Battles use turns, with initiative rolled once at the start of each
   battle. Characters can attack, defend, use items, and use class skills.
-- [x] The four classes have different roles: Cleric (healing and revival),
+- [ ] The four classes have different roles: Cleric (healing and revival),
   Fighter (resilience and protecting allies), Rogue (agility and conditional
   critical hits), and Wizard (dark magic, support, and damage).
-- [x] Cooperative and role-appropriate play can earn bonus XP. Characters can
+- [ ] Cooperative and role-appropriate play can earn bonus XP. Characters can
   level up during a run and gain advantages.
-- [x] Downed players become spectators, can offer one support action per
+- [ ] Downed players become spectators, can offer one support action per
   battle, and may be revived. Each player starts with a revive scroll.
-- [x] Finding the objective starts a final battle against the player-controlled
+- [ ] Finding the objective starts a final battle against the player-controlled
   imposter, even if the imposter is downed. The battle's outcome determines the
   winner unless the whole party died before finding the objective.
-- [x] The server validates actions and keeps game state consistent and private
+- [ ] The server validates actions and keeps game state consistent and private
   to the correct party room. The client shows action results and run outcomes.
 
 The exact combat balance, XP and level formulas, revival rules, and dungeon
