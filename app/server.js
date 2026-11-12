@@ -7,6 +7,9 @@ const port = 3000;
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 const RoomState = require("./room-state");
 const rooms = new Map();
 
@@ -128,6 +131,13 @@ function handleStartGame(socket) {
 // ---------------------------
 // REQUESTS
 // ---------------------------
+
+app.use("{*whatever}", (req, res, next) => {
+  //if (req.cookie.playerId), save it (res.locals.playerId = req.cookie.playerId)
+  // else, generate token (res.locals.playerId = //generateId()//)
+  // res.cookie("playerId", token);
+  next();
+});
 
 app.get("/code", (req, res) => {
   if (!req.query.code) {
