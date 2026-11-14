@@ -4,6 +4,8 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
+const reconnectTimeout = 10 * 1000;
+
 const { randomUUID, randomBytes } = require("crypto");
 const cookieParser = require("cookie-parser");
 
@@ -92,7 +94,7 @@ wss.on("connection", (socket, request) => {
         return;
       }
 
-      removePlayerFromRoom(socket.roomCode, socket.playerId);
+      reserveDisconnectedPlayer(socket);
     });
   });
 });
@@ -134,7 +136,9 @@ function handleJoinRoom(socket, message) {
   room.players.set(playerSlot, {
     id: playerId,
     token: socket.reconnectToken,
-    socket
+    socket,
+    disconnectedAt: null,
+    expireTimer: null
   });
 
   if (playerSlot === 1) {
@@ -244,6 +248,34 @@ function broadcastPlayers(roomCode) {
     if (client.roomCode === roomCode && client.readyState === WebSocket.OPEN) {
       client.send(message);
     }
+  }
+}
+
+function reserveDisconnectedPlayer(socket) {
+  const room = rooms.get(socket.roomCode);
+  if (!room) {
+    return;
+  }
+
+  for (const [slot, player] of room.players) {
+    if (player.id !== socket.playerId || player.socket !== socket) {
+      continue;
+    }
+
+    player.socket = null;
+    player.disconnectedAt = Date.now();
+
+    player.expiryTimer = setTimeout(() => {
+      if (
+        rooms.get(socket.roomCode) === room &&
+        room.players.get(slot) === player &&
+        player.socket === null
+      ) {
+        removePlayerFromRoom(socket.roomCode, player.id);
+      }
+    }, reconnectTimeout);
+
+    return;
   }
 }
 
