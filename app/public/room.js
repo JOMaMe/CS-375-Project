@@ -37,6 +37,10 @@ socket.addEventListener("message", (event) => {
     startButton.hidden = !isHost;
     connectionStatus.textContent = `Joined room ${message.code} as ${(isHost) ? "host" : "player"}.`;
     renderPlayers(message.players);
+    connectionStatus.textContent += message.resumed ? " (Reconnected)" : "";
+    if (message.status === 1) {
+      startGame();
+    }
     hasJoinedRoom = true;
   } else if (message.type === "players") {
     renderPlayers(message.players);
@@ -74,6 +78,7 @@ function renderPlayers(players) {
   }
 }
 function startGame() {
+  gameWindow.prepend(connectionStatus);
   waitingRoom.hidden = true;
   gameWindow.hidden = false;
 }

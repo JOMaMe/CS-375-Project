@@ -4,7 +4,7 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
-const reconnectTimeout = 10 * 1000;
+const reconnectTimeout = 5 * 60 * 1000;
 
 const { randomUUID, randomBytes } = require("crypto");
 const cookieParser = require("cookie-parser");
@@ -63,9 +63,19 @@ wss.on("connection", (socket, request) => {
     }
 
     socket.reconnectToken = token;
-    console.log("WebSocket received a valid reconnect cookie.");
 
     socket.on("message", (data) => {
+      if (socket.roomCode && socket.playerId) {
+        const room = rooms.get(socket.roomCode);
+        const ownsPlayer = room && Array.from(room.players.values()).some(
+          (player) => player.id === socket.playerId && player.socket === socket
+        );
+
+        if (!ownsPlayer) {
+          socket.close(4001, "Replaced by a newer connection");
+          return;
+        }
+      }
       let message;
       try {
         message = JSON.parse(data.toString());
@@ -123,32 +133,82 @@ function handleJoinRoom(socket, message) {
   }
 
   const room = rooms.get(roomCode);
-  const playerSlot = [1, 2, 3, 4].find((slot) => !room.players.has(slot));
-  if (playerSlot === undefined) {
-    socket.send(JSON.stringify({ type: "error", message: "Room is full" }));
-    socket.close(1008, "Room is full");
-    return;
+    // Find this browser's existing player before checking for a free slot.
+  let player = Array.from(room.players.values()).find(
+    (candidate) => candidate.token === socket.reconnectToken
+  );
+
+  // Timers can run late if the server is busy, so check the deadline too.
+  if (
+    player &&
+    player.disconnectedAt !== null &&
+    Date.now() - player.disconnectedAt >= reconnectTimeout
+  ) {
+    clearTimeout(player.expireTimer);
+    removePlayerFromRoom(roomCode, player.id);
+    player = undefined;
+
+    // Removing the final expired player also deletes the room.
+    if (!rooms.has(roomCode)) {
+      socket.send(JSON.stringify({
+        type: "error",
+        message: "Your reservation expired and the room no longer exists."
+      }));
+      socket.close(1008, "Room no longer exists");
+      return;
+    }
   }
 
-  const playerId = randomUUID();
-  socket.playerId = playerId;
+  const resumed = Boolean(player);
+
+  if (player) {
+    clearTimeout(player.expireTimer);
+
+    const previousSocket = player.socket;
+    player.socket = socket;
+    player.expireTimer = null;
+    player.disconnectedAt = null;
+
+    // The new connection owns the player before the old one closes.
+    if (previousSocket && previousSocket !== socket) {
+      previousSocket.close(4001, "Replaced by a newer connection");
+    }
+  } else {
+    const playerSlot = [1, 2, 3, 4].find(
+      (slot) => !room.players.has(slot)
+    );
+
+    if (playerSlot === undefined) {
+      socket.send(JSON.stringify({ type: "error", message: "Room is full" }));
+      socket.close(1008, "Room is full");
+      return;
+    }
+
+    player = {
+      id: randomUUID(),
+      token: socket.reconnectToken,
+      socket,
+      disconnectedAt: null,
+      expireTimer: null
+    };
+
+    room.players.set(playerSlot, player);
+
+    if (playerSlot === 1) {
+      room.host = player.id;
+    }
+  }
+
+  socket.playerId = player.id;
   socket.roomCode = roomCode;
-  room.players.set(playerSlot, {
-    id: playerId,
-    token: socket.reconnectToken,
-    socket,
-    disconnectedAt: null,
-    expireTimer: null
-  });
 
-  if (playerSlot === 1) {
-    room.host = playerId;
-  }
   socket.send(JSON.stringify({
     type: "joined",
     code: roomCode,
-    playerId,
+    playerId: player.id,
     host: room.host,
+    resumed,
+    status: room.status,
     players: publicPlayers(room)
   }));
   broadcastPlayers(roomCode);
@@ -265,7 +325,7 @@ function reserveDisconnectedPlayer(socket) {
     player.socket = null;
     player.disconnectedAt = Date.now();
 
-    player.expiryTimer = setTimeout(() => {
+    player.expireTimer = setTimeout(() => {
       if (
         rooms.get(socket.roomCode) === room &&
         room.players.get(slot) === player &&
