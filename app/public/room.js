@@ -11,57 +11,99 @@ let hasJoinedRoom = false;
 roomCodeElement.textContent = roomCode ? roomCode.toUpperCase() : "";
 
 const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const socket = new WebSocket(`${protocol}//${window.location.host}`);
+let socket;
+let retryAttempt = 0;
 
-socket.addEventListener("open", () => {
-  connectionStatus.textContent = "Connected. Checking room...";
-  socket.send(JSON.stringify({
-    type: "join-room",
-    code: roomCode
-  }));
-});
+function connect() {
+  const connection = new WebSocket(`${protocol}//${window.location.host}`);
+  socket = connection;
+  let serverError = "";
 
-socket.addEventListener("message", (event) => {
-  let message;
-  try {
-    message = JSON.parse(event.data);
-  } catch (error) {
-    console.error("Received an invalid server message:", error);
-    connectionStatus.textContent = "Received an invalid response from the server.";
-    return;
-  }
+  connection.addEventListener("open", () => {
+    connectionStatus.textContent = "Connected. Checking room...";
+    connection.send(JSON.stringify({
+      type: "join-room",
+      code: roomCode
+    }));
+  });
 
-  if (message.type === "joined") {
-    id = message.playerId;
-    const isHost = (message.host === id);
-    startButton.hidden = !isHost;
-    connectionStatus.textContent = `Joined room ${message.code} as ${(isHost) ? "host" : "player"}.`;
-    renderPlayers(message.players);
-    connectionStatus.textContent += message.resumed ? " (Reconnected)" : "";
-    if (message.status === 1) {
-      startGame();
+  connection.addEventListener("message", (event) => {
+    let message;
+    try {
+      message = JSON.parse(event.data);
+    } catch (error) {
+      console.error("Received an invalid server message:", error);
+      connectionStatus.textContent = "Received an invalid response from the server.";
+      return;
     }
-    hasJoinedRoom = true;
-  } else if (message.type === "players") {
-    renderPlayers(message.players);
-  } else if (message.type === "game-started") {
-    startGame();
-  }
-  else if (message.type === "error") {
-    connectionStatus.textContent = message.message;
-  }
-});
 
-socket.addEventListener("close", () => {
-  if (hasJoinedRoom || connectionStatus.textContent === "Connected. Checking room...") {
-    connectionStatus.textContent = "Disconnected from the room.";
-  }
-});
+    if (message.type === "joined") {
+      const previousId = id;
+      const wasReconnecting = hasJoinedRoom;
 
-socket.addEventListener("error", (error) => {
-  console.error("WebSocket connection error:", error);
-  connectionStatus.textContent = "Could not connect to the room.";
-});
+      id = message.playerId;
+      retryAttempt = 0;
+
+      const isHost = message.host === id;
+      startButton.hidden = !isHost;
+      startButton.disabled = false;
+      renderPlayers(message.players);
+
+      if (message.resumed) {
+        connectionStatus.textContent = `Reconnected to room ${message.code}.`;
+      } else if (wasReconnecting && previousId !== id) {
+        connectionStatus.textContent =
+          "Your previous session was not restored. You joined as a new player.";
+      } else {
+        connectionStatus.textContent =
+          `Joined room ${message.code} as ${isHost ? "host" : "player"}.`;
+      }
+
+      if (message.status === 1) {
+        startGame();
+      }
+
+      hasJoinedRoom = true;
+    } else if (message.type === "players") {
+      renderPlayers(message.players);
+    } else if (message.type === "game-started") {
+      startGame();
+    } else if (message.type === "error") {
+      serverError = message.message;
+      connectionStatus.textContent = serverError;
+    }
+  });
+
+  connection.addEventListener("close", (event) => {
+    startButton.disabled = true;
+
+    if (event.code === 4001) {
+      connectionStatus.textContent =
+        "This room was opened in another tab. This tab has been disconnected.";
+      return;
+    }
+
+    if (event.code === 1008) {
+      connectionStatus.textContent =
+        serverError || "The server rejected the connection.";
+      return;
+    }
+
+    const baseDelay = Math.min(1000 * (2 ** retryAttempt), 30000);
+    const delay = Math.min(30000, baseDelay * (0.8 + Math.random() * 0.4));
+    retryAttempt = Math.min(retryAttempt + 1, 5);
+
+    connectionStatus.textContent =
+      `Disconnected. Retrying in about ${Math.ceil(delay / 1000)} seconds...`;
+    setTimeout(connect, delay);
+  });
+
+  connection.addEventListener("error", (error) => {
+    console.error("WebSocket connection error:", error);
+  });
+}
+
+connect();
 
 function renderPlayers(players) {
   playersList.replaceChildren();
@@ -84,7 +126,7 @@ function startGame() {
 }
 
 startButton.addEventListener("click", () => {
-  if (socket.readyState !== WebSocket.OPEN) {
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
     connectionStatus.textContent = "Not connected to the server.";
     return;
   }

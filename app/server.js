@@ -58,26 +58,6 @@ wss.on("connection", (socket, request) => {
     console.error("WebSocket error:", error);
   });
 
-  const heartbeatInterval = setInterval(() => {
-  for (const socket of wss.clients) {
-    if (socket.readyState !== WebSocket.OPEN) {
-      continue;
-    }
-
-    if (!socket.isAlive) {
-      socket.terminate();
-      continue;
-    }
-
-    socket.isAlive = false;
-    socket.ping();
-  }
-}, 30 * 1000);
-
-wss.on("close", () => {
-  clearInterval(heartbeatInterval);
-});
-
   cookieParser()(request, null, () => {
     const token = request.cookies.reconnectToken;
     const validToken =
@@ -137,6 +117,26 @@ wss.on("close", () => {
       reserveDisconnectedPlayer(socket);
     });
   });
+});
+
+const heartbeatInterval = setInterval(() => {
+  for (const socket of wss.clients) {
+    if (socket.readyState !== WebSocket.OPEN) {
+      continue;
+    }
+
+    if (!socket.isAlive) {
+      socket.terminate();
+      continue;
+    }
+
+    socket.isAlive = false;
+    socket.ping();
+  }
+}, 30 * 1000);
+
+wss.on("close", () => {
+  clearInterval(heartbeatInterval);
 });
 
 // ---------------------------
