@@ -4,17 +4,38 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
+const { randomUUID, randomBytes } = require("crypto");
+const cookieParser = require("cookie-parser");
+
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+  const token = req.cookies.reconnectToken;
+  const validToken = typeof token === "string" && /^[a-f0-9]{64}$/.test(token);
+
+  if (!validToken) {
+    res.cookie("reconnectToken", randomBytes(32).toString("hex"), {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: req.secure,
+      path: "/",
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    });
+  }
+
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+
 
 const RoomState = require("./room-state");
 const rooms = new Map();
 
 const http = require("http");
-const { randomUUID } = require("crypto");
+
 const { WebSocket, WebSocketServer } = require("ws");
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
@@ -24,40 +45,57 @@ const messageHandlers = new Map([
   ["start-game", handleStartGame]
 ]);
 
-wss.on("connection", (socket) => {
-  socket.on("message", (data) => {
-    let message;
-    try {
-      message = JSON.parse(data.toString());
-    } catch (error) {
-      socket.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
-      socket.close(1008, "Invalid message format");
+wss.on("connection", (socket, request) => {
+  cookieParser()(request, null, () => {
+    const token = request.cookies.reconnectToken;
+    const validToken =
+      typeof token === "string" && /^[a-f0-9]{64}$/.test(token);
+
+    if (!validToken) {
+      socket.send(JSON.stringify({
+        type: "error",
+        message: "Missing or invalid reconnect cookie. Reload the page."
+      }));
+      socket.close(1008, "Missing or invalid reconnect cookie");
       return;
     }
 
-    if (!message || typeof message !== "object" || typeof message.type !== "string") {
-      socket.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
-      return;
-    }
+    socket.reconnectToken = token;
+    console.log("WebSocket received a valid reconnect cookie.");
 
-    const handler = messageHandlers.get(message.type);
-    if (!handler) {
-      socket.send(JSON.stringify({ type: "error", message: `Unsupported message type: ${message.type}` }));
-      return;
-    }
+    socket.on("message", (data) => {
+      let message;
+      try {
+        message = JSON.parse(data.toString());
+      } catch (error) {
+        socket.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
+        socket.close(1008, "Invalid message format");
+        return;
+      }
 
-    handler(socket, message);
-  });
+      if (!message || typeof message !== "object" || typeof message.type !== "string") {
+        socket.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
+        return;
+      }
 
-  socket.on("close", () => {
-    if (!socket.roomCode || !socket.playerId) {
-      return;
-    }
+      const handler = messageHandlers.get(message.type);
+      if (!handler) {
+        socket.send(JSON.stringify({ type: "error", message: `Unsupported message type: ${message.type}` }));
+        return;
+      }
 
-    removePlayerFromRoom(socket.roomCode, socket.playerId);
+      handler(socket, message);
+    });
+
+    socket.on("close", () => {
+      if (!socket.roomCode || !socket.playerId) {
+        return;
+      }
+
+      removePlayerFromRoom(socket.roomCode, socket.playerId);
+    });
   });
 });
-
 
 // ---------------------------
 // WEBSOCKET MESSAGE HANDLERS
@@ -93,7 +131,12 @@ function handleJoinRoom(socket, message) {
   const playerId = randomUUID();
   socket.playerId = playerId;
   socket.roomCode = roomCode;
-  room.players.set(playerSlot, playerId);
+  room.players.set(playerSlot, {
+    id: playerId,
+    token: socket.reconnectToken,
+    socket
+  });
+
   if (playerSlot === 1) {
     room.host = playerId;
   }
@@ -102,7 +145,7 @@ function handleJoinRoom(socket, message) {
     code: roomCode,
     playerId,
     host: room.host,
-    players: Array.from(room.players.entries())
+    players: publicPlayers(room)
   }));
   broadcastPlayers(roomCode);
 }
@@ -132,12 +175,7 @@ function handleStartGame(socket) {
 // REQUESTS
 // ---------------------------
 
-app.use("{*whatever}", (req, res, next) => {
-  //if (req.cookie.playerId), save it (res.locals.playerId = req.cookie.playerId)
-  // else, generate token (res.locals.playerId = //generateId()//)
-  // res.cookie("playerId", token);
-  next();
-});
+
 
 app.get("/code", (req, res) => {
   if (!req.query.code) {
@@ -187,6 +225,10 @@ function validateCode(code) {
   return { valid: true, code: normalizedCode };
 }
 
+function publicPlayers(room) {
+  return Array.from(room.players, ([slot, player]) => [slot, player.id]);
+}
+
 function broadcastPlayers(roomCode) {
   const room = rooms.get(roomCode);
   if (!room) {
@@ -195,7 +237,7 @@ function broadcastPlayers(roomCode) {
 
   const message = JSON.stringify({
     type: "players",
-    players: Array.from(room.players.entries())
+    players: publicPlayers(room)
   });
 
   for (const client of wss.clients) {
@@ -211,8 +253,8 @@ function removePlayerFromRoom(roomCode, playerId) {
     return;
   }
 
-  for (const [slot, id] of room.players) {
-    if (id === playerId) {
+  for (const [slot, player] of room.players) {
+    if (player.id === playerId) {
       room.players.delete(slot);
       break;
     }
