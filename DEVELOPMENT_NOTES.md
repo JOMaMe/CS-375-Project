@@ -269,3 +269,71 @@ The button rule includes `transition: background-color 0.3s ease, transform 0.3s
 I added a `room-page` class to the room page's body so I can control its spacing without changing the home page. `.waiting-room` uses the shared panel colors and `margin-inline: auto` to center it. Separate rules make the room code stand out, remove the default player-list bullets, and add dividers between players. The Start button uses the same ember color and keyboard-focus outline as Host.
 
 The game scene has its own existing rules in `room.css`; I have not redesigned that part yet. The styling does not add player names or connection details that the server does not currently send.
+
+## 2026-11-14: Anonymous room reconnection
+
+I worked through a first version of anonymous reconnection using the native
+`ws` WebSocket library. This is separate from accounts: the browser receives a
+random secret cookie, and the server uses it to find the same player record
+when that browser reconnects to a room.
+
+### What is implemented
+
+- Express uses `cookie-parser` and creates a 32-byte random hexadecimal
+  `reconnectToken` cookie when the browser does not already have a valid-format
+  token. The cookie is `HttpOnly`, has `SameSite=Lax`, uses the root path, and
+  currently lasts 30 days. It is not copied into localStorage.
+- The WebSocket handshake parses the cookie and attaches its token to the
+  socket. The token stays server-side and is not included in public roster
+  messages.
+- A room's player map now stores records containing the public player ID,
+  reconnect token, current socket, disconnect timestamp, and expiry timer.
+  Public rosters are still sent as `[slot, playerId]` pairs.
+- A disconnected player record is reserved for five minutes. The join handler
+  checks for the same token before checking room capacity, allowing the same
+  slot and player ID to be recovered.
+- On recovery, the server cancels the reservation timer and attaches the new
+  socket. A new connection replaces an older one using close code `4001`.
+  Message ownership checks and the close handler's socket identity check help
+  prevent the old connection from acting on or disconnecting the replacement.
+- The `joined` message includes whether the player resumed and the room status.
+  The client uses the status to show the game view again when the game had
+  already started.
+- The browser retries unexpected WebSocket closures with exponential backoff,
+  jitter, and a 30-second delay cap. A successful join resets the backoff.
+  Retries stop for close code `4001` (replaced connection) and `1008` (server
+  policy rejection).
+- The server sends WebSocket pings every 30 seconds, tracks pong responses,
+  and terminates sockets that fail to respond. This lets the existing close
+  handler start the reservation when a connection silently stops responding.
+- Connection status is moved into the game view after the game starts, so
+  connection and recovery messages remain visible there.
+
+### Checks completed
+
+- Confirmed that opening the same room in another tab in the same browser
+  profile uses the shared cookie and takes over the same player identity.
+  A private browsing context has a separate cookie store and can join as a
+  different player.
+- Simulated an unexpected socket close in the browser. The client retried and
+  recovered as the same Player 1.
+- Started a game and refreshed the page. The player rejoined, and the client
+  returned to the game view.
+- Restarted the server and repeated the simulated socket-close retry check.
+
+### Remaining work and limitations
+
+- A real network interruption has not yet been tested end-to-end. Browser
+  offline simulation may take roughly 30 to 60 seconds for the heartbeat to
+  detect a silent socket, followed by the client's retry delay.
+- Back/Forward cache restoration still needs handling and testing.
+- The five-minute reservation and rooms are in memory. A server restart loses
+  rooms and reservations; cookie persistence alone cannot restore them.
+- Game state is not yet populated or associated with player IDs by the game
+  engine. Reconnection currently restores the player's room identity and the
+  waiting/game view, not a character or gameplay snapshot.
+- The roster does not yet indicate which reserved players are offline.
+- The UI does not reliably distinguish an expired reservation after a full
+  page reload from an ordinary new join. A full, privacy-safe authoritative
+  game-state snapshot is also future work.
+- Host succession when the host's reservation expires remains undecided.
