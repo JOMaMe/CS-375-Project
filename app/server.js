@@ -48,6 +48,36 @@ const messageHandlers = new Map([
 ]);
 
 wss.on("connection", (socket, request) => {
+  socket.isAlive = true;
+
+  socket.on("pong", () => {
+    socket.isAlive = true;
+  });
+
+  socket.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
+
+  const heartbeatInterval = setInterval(() => {
+  for (const socket of wss.clients) {
+    if (socket.readyState !== WebSocket.OPEN) {
+      continue;
+    }
+
+    if (!socket.isAlive) {
+      socket.terminate();
+      continue;
+    }
+
+    socket.isAlive = false;
+    socket.ping();
+  }
+}, 30 * 1000);
+
+wss.on("close", () => {
+  clearInterval(heartbeatInterval);
+});
+
   cookieParser()(request, null, () => {
     const token = request.cookies.reconnectToken;
     const validToken =
