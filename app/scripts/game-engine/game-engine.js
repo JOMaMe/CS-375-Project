@@ -1,4 +1,5 @@
-const dungeonSize = 10;
+const dungeonWidth = 5;
+const dungeonHeight = 10;
 
 function startGame(roomState) {
     assignCharacters(roomState);
@@ -10,6 +11,6 @@ function assignCharacters(roomState) {
 }
 
 function generateDungeon(roomState) {
-    let grid = Array.from({ length: dungeonSize }, () => Array(dungeonSize).fill(null));
+    let grid = Array.from({ length: dungeonHeight }, () => Array(dungeonWidth).fill(null));
     return;
 }

@@ -33,7 +33,7 @@ app.use(express.json());
 
 
 
-const RoomState = require("./room-state");
+const RoomState = require("./scripts/room-state");
 const rooms = new Map();
 
 const http = require("http");
