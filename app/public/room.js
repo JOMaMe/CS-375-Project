@@ -38,6 +38,9 @@ function connect() {
     }
 
     if (message.type === "joined") {
+      if (message.status === 1) {
+        
+      }
       const previousId = id;
       const wasReconnecting = hasJoinedRoom;
 
@@ -59,15 +62,11 @@ function connect() {
           `Joined room ${message.code} as ${isHost ? "host" : "player"}.`;
       }
 
-      if (message.status === 1) {
-        startGame();
-      }
-
       hasJoinedRoom = true;
     } else if (message.type === "players") {
       renderPlayers(message.players);
     } else if (message.type === "game-started") {
-      startGame();
+      startGame(message.gameState);
     } else if (message.type === "error") {
       serverError = message.message;
       connectionStatus.textContent = serverError;
@@ -119,7 +118,7 @@ function renderPlayers(players) {
     playersList.append(player);
   }
 }
-function startGame() {
+function startGame(gameState) {
   gameWindow.prepend(connectionStatus);
   waitingRoom.hidden = true;
   gameWindow.hidden = false;

@@ -34,6 +34,7 @@ app.use(express.json());
 
 
 const RoomState = require("./scripts/room-state");
+const { startGame } = require("./scripts/game-engine/game-engine");
 const rooms = new Map();
 
 const http = require("http");
@@ -189,6 +190,15 @@ function handleJoinRoom(socket, message) {
     }
   }
 
+  if (room.status === 1 && !player) {
+    socket.send(JSON.stringify({
+      type: "error",
+      message: "This game has already started"
+    }));
+    socket.close(1008, "Game already started");
+    return;
+  }
+
   const resumed = Boolean(player);
 
   if (player) {
@@ -255,8 +265,13 @@ function handleStartGame(socket) {
     return;
   }
 
+  startGame(room);
+
   room.status = 1;
-  const message = JSON.stringify({ type: "game-started" });
+  const message = JSON.stringify({
+    type: "game-started",
+    gameState: room.gameState.public
+  });
   for (const client of wss.clients) {
     if (client.roomCode === socket.roomCode && client.readyState === WebSocket.OPEN) {
       client.send(message);

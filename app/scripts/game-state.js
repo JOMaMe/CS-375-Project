@@ -21,3 +21,5 @@ class GameState {
         this.public.enemies.push(enemy);
     }
 }
+
+module.exports = { GameState };
