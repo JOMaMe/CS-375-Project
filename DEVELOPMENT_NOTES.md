@@ -337,3 +337,52 @@ when that browser reconnects to a room.
   page reload from an ordinary new join. A full, privacy-safe authoritative
   game-state snapshot is also future work.
 - Host succession when the host's reservation expires remains undecided.
+
+## 2026-11-20: First PixiJS integration
+
+The assistant created `PIXIJS_GUIDE.md` and implemented an initial scene at my
+request. This is a starting point to read, experiment with, and extend while
+learning the library.
+
+### Implemented
+
+- PixiJS 8.6.6 is served locally from `app/public/vendor/`, with its MIT license.
+- `game-scene.js` recreates the existing background and two placeholder
+  characters using containers and sprites.
+- Characters support hover highlighting, pointer selection, and a selection
+  ring. HTML buttons offer the same selection using a keyboard.
+- Pointer positions are converted to logical scene coordinates. Scene resizing
+  preserves proportions and keeps hit testing aligned.
+- `room.js` initializes one scene after revealing the game view, and restores
+  that view on joining a room whose status is already started.
+- Scene loading failures are shown independently of connection messages.
+- The engine's start-position assignment was corrected to use
+  `roomState.gameState.public.map.coords` and `dungeon.startRoom.position`.
+  Previously it referenced missing fields and blocked starting the game.
+
+### Validation completed
+
+Automated checks ran against the actual local Express/WebSocket server using
+headless Chromium with software WebGL:
+
+- Host a room and start the game; the canvas and both existing images load.
+- Pointer movement reports the expected scene coordinates.
+- Hover changes the sprite tint; selection persists after the pointer leaves.
+- Pointer clicks and keyboard activation of the HTML buttons select characters.
+- After resizing from 1280x800 to 900x600, the same scene positions remain clickable.
+- Unexpected socket closure reconnects without adding another canvas.
+- Refreshing a started room restores the preview with one canvas.
+- Blocking the character image shows the expected loading error with no canvas.
+- The successful flow produced no uncaught browser errors.
+
+JavaScript syntax checks and `git diff --check` passed. A screenshot of the
+900x600 view was also inspected. Human mouse/touch testing and checks in other
+browsers remain to be done.
+
+### Next work
+
+These two characters are preview objects, not server-created player characters.
+Selection currently stays in the browser. Actual character rendering needs an
+agreed state format with stable entity IDs; attacks, skills, navigation, and
+private-map rendering remain future work. See `PIXIJS_GUIDE.md` for the walkthrough,
+planned responsibilities, and repeatable manual checks.

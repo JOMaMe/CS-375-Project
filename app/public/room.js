@@ -7,6 +7,7 @@ const waitingRoom = document.getElementById("waiting-room");
 const gameWindow = document.querySelector(".game-window");
 let id = "";
 let hasJoinedRoom = false;
+let scenePromise;
 
 roomCodeElement.textContent = roomCode ? roomCode.toUpperCase() : "";
 
@@ -38,9 +39,6 @@ function connect() {
     }
 
     if (message.type === "joined") {
-      if (message.status === 1) {
-        
-      }
       const previousId = id;
       const wasReconnecting = hasJoinedRoom;
 
@@ -63,6 +61,9 @@ function connect() {
       }
 
       hasJoinedRoom = true;
+      if (message.status === 1) {
+        startGame();
+      }
     } else if (message.type === "players") {
       renderPlayers(message.players);
     } else if (message.type === "game-started") {
@@ -122,6 +123,22 @@ function startGame(gameState) {
   gameWindow.prepend(connectionStatus);
   waitingRoom.hidden = true;
   gameWindow.hidden = false;
+
+  // Initialize after revealing the scene so its container has a size.
+  // Cache the promise so reconnects cannot create another canvas.
+  if (!scenePromise) {
+    const sceneStatus = document.getElementById("scene-status");
+    sceneStatus.textContent = "Loading scene...";
+    scenePromise = createGameScene(
+      document.getElementById("game-scene"),
+      sceneStatus,
+      document.getElementById("scene-selection")
+    ).catch((error) => {
+      console.error("Could not load the game scene:", error);
+      sceneStatus.textContent = "Could not load the scene. Refresh to try again.";
+    });
+  }
+  // gameState will drive characters and encounters in a later milestone.
 }
 
 startButton.addEventListener("click", () => {

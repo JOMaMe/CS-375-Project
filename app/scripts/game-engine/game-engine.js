@@ -20,7 +20,7 @@ function generateDungeon(roomState) {
     }
     printDungeon(dungeon);
     roomState.gameState.private.dungeon = dungeon;
-    roomState.public.map.coords.push(dungeon.startRoom.coords);
+    roomState.gameState.public.map.coords = [dungeon.startRoom.position];
 }
 
 

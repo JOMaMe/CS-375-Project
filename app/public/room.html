@@ -19,27 +19,23 @@
 
 <div class="game-window" hidden>
     <div class="container">
-        <div class="rendering-window">
-            <div class="background-layer">
-                <img src="assets/background.jpg">
-            </div>
-
-            <div class="character-layer">
-                <img id="peter" src="assets/Peter_Griffin.webp" style="left: 100px; top: 200px;">
-                <img id="peter" src="assets/Peter_Griffin.webp" style="left: 400px; top: 200px;">
-            </div>
-
-            <div class="vfx-layer">
-                <img src="">
-            </div>
-        </div>
+        <div class="rendering-window" id="game-scene" aria-label="Dungeon scene preview"></div>
         <div id="map" class="menu">Map Menu</div>
         <div id="bottom-bar">
             <div id="action" class="menu">Action Bar</div>
             <div id="inventory" class="menu">Inventory Bar</div>
         </div>
-        <div id="stats" class="menu">Stats Menu</div>
+        <div id="stats" class="menu">
+            <h2>Scene preview</h2>
+            <p id="scene-status" role="status">Waiting for the scene.</p>
+            <p id="scene-selection" role="status">No character selected.</p>
+            <p>Hover over a character to highlight it. Click to select it.</p>
+            <button class="scene-target" data-character="0">Select character 1</button>
+            <button class="scene-target" data-character="1">Select character 2</button>
+        </div>
     </div>
 </div>
+<script src="vendor/pixi-8.6.6.min.js"></script>
+<script src="game-scene.js"></script>
 <script src="room.js"></script>
 </body>
