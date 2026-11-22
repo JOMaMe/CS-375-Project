@@ -34,7 +34,7 @@ app.use(express.json());
 
 
 const RoomState = require("./scripts/room-state");
-const { startGame } = require("./scripts/game-engine/game-engine");
+const { initializeGame } = require("./scripts/game-engine/game-engine");
 const rooms = new Map();
 
 const http = require("http");
@@ -249,6 +249,7 @@ function handleJoinRoom(socket, message) {
     host: room.host,
     resumed,
     status: room.status,
+    gameState: room.status === 1 ? room.gameState.public : null,
     players: publicPlayers(room)
   }));
   broadcastPlayers(roomCode);
@@ -265,7 +266,7 @@ function handleStartGame(socket) {
     return;
   }
 
-  startGame(room);
+  initializeGame(room);
 
   room.status = 1;
   const message = JSON.stringify({

@@ -6,7 +6,11 @@ class GameState {
                 front: [],
                 back: []
             },
-            map: {}
+            map: {
+                dimensions: { height: 0, width: 0 },
+                discovered: [],
+                frontier: []
+            }
         };
         this.private = {
             dungeon: {}

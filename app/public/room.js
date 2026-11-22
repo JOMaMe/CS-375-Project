@@ -8,6 +8,7 @@ const gameWindow = document.querySelector(".game-window");
 let id = "";
 let hasJoinedRoom = false;
 let scenePromise;
+let mapPromise;
 
 roomCodeElement.textContent = roomCode ? roomCode.toUpperCase() : "";
 
@@ -62,7 +63,7 @@ function connect() {
 
       hasJoinedRoom = true;
       if (message.status === 1) {
-        startGame();
+        startGame(message.gameState);
       }
     } else if (message.type === "players") {
       renderPlayers(message.players);
@@ -119,10 +120,30 @@ function renderPlayers(players) {
     playersList.append(player);
   }
 }
+
+async function updateMap(gameState) {
+  const mapState = gameState?.public?.map ?? gameState?.map;
+  if (!mapState) {
+    throw new Error("Game state does not include public map data.");
+  }
+
+  if (!mapPromise) {
+    mapPromise = createMapGrid(document.getElementById("map"), mapState);
+  }
+  const mapScene = await mapPromise;
+  mapScene.updateMap(gameState);
+}
+
 function startGame(gameState) {
   gameWindow.prepend(connectionStatus);
   waitingRoom.hidden = true;
   gameWindow.hidden = false;
+
+  const mapElement = document.getElementById("map");
+  updateMap(gameState).catch((error) => {
+    console.error("Could not update the game map:", error);
+    mapElement.textContent = "Could not update the map.";
+  });
 
   // Initialize after revealing the scene so its container has a size.
   // Cache the promise so reconnects cannot create another canvas.
@@ -138,7 +159,6 @@ function startGame(gameState) {
       sceneStatus.textContent = "Could not load the scene. Refresh to try again.";
     });
   }
-  // gameState will drive characters and encounters in a later milestone.
 }
 
 startButton.addEventListener("click", () => {
